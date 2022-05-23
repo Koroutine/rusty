@@ -1,0 +1,18 @@
+{
+  "root": "libs/shared",
+  "projectType": "library",
+  "sourceRoot": "libs/shared",
+  "targets": {
+    "test": {
+      "executor": "./tools/executors/go:test",
+      "options": {
+        "skipRace": true,
+        "skipCover": true
+      }
+    },
+    "lint": {
+      "executor": "@nx-go/nx-go:lint"
+    }
+  },
+  "tags": []
+}
