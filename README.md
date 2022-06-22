@@ -21,11 +21,10 @@
   </p>
 </div>
 
-
-### Built With
+<!-- Built With -->
+## Built With
 
 Generics!
-
 
 
 <!-- GETTING STARTED -->
@@ -57,8 +56,11 @@ import (
 )
 
 myValue := rusty.ToResult(strconv.ParseInt("20", 10, 64)).Unwrap() // Will panic if error
+
 myRune := rusty.ToEither(utf8.DecodeRuneInString(" ")).Left() // Get the left side of the output
+
 jsonString := json.ToString(&data).Unwrap() // Returns JSON string or panics!
+
 myFloat := rusty.ToString("ABC: 1.0").Replace("ABC: ", "").ParseFloat().Unwrap()
 ```
 
