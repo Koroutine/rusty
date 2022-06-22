@@ -68,6 +68,22 @@ func (o *Result[T]) UnwrapOrElseE(fn func(err error) T) T {
 	return o.data
 }
 
+func (o *Result[T]) MapErr(fn func(err error) error) *Result[T] {
+	if o.err != nil {
+		o.err = fn(o.err)
+	}
+
+	return o
+}
+
+func (o *Result[T]) Map(fn func(value T) T) *Result[T] {
+	if o.err == nil {
+		o.data = fn(o.data)
+	}
+
+	return o
+}
+
 func (o *Result[T]) IsOk() bool {
 	if o.err != nil {
 		return false
