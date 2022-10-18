@@ -36,6 +36,14 @@ func (o *Result[T]) Unwrap() T {
 	return o.data
 }
 
+func (o *Result[T]) UnwrapSafe(fn func(err error)) T {
+  if o.err != nil {
+    fn(o.err)
+  }
+
+  return o.data
+}
+
 func (o *Result[T]) Expect(message string) T {
 	if o.err != nil {
 		panic(fmt.Errorf("%s: %w", message, o.err))
