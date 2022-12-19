@@ -2,6 +2,7 @@ package rusty
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -38,4 +39,16 @@ func Get[T any](d Map, keypath string) *Result[T] {
 
 	return ToResult(v, fmt.Errorf("path not found: %s", keypath))
 
+}
+
+func GetInt(d Map, keypath string) *Result[int] {
+	res := Get[string](d, keypath)
+
+	if res.IsErr() {
+		return ToResult(0, res.err)
+	}
+
+	v, err := strconv.ParseInt(res.data, 10, 64)
+
+	return ToResult(int(v), err)
 }
