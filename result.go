@@ -37,11 +37,11 @@ func (o *Result[T]) Unwrap() T {
 }
 
 func (o *Result[T]) UnwrapSafe(fn func(err error)) T {
-  if o.err != nil {
-    fn(o.err)
-  }
+	if o.err != nil {
+		fn(o.err)
+	}
 
-  return o.data
+	return o.data
 }
 
 func (o *Result[T]) Expect(message string) T {
@@ -126,4 +126,16 @@ func (o *Result[T]) IsErrWith(fn func(err error) bool) bool {
 	}
 
 	return fn(o.err)
+}
+
+func MapResult[T any, N any](result *Result[T], fn func(value T) N) *Result[N] {
+
+	if result.IsOk() {
+		data := fn(result.Unwrap())
+		return ToResult(data, nil)
+	}
+
+	return &Result[N]{
+		err: result.err,
+	}
 }

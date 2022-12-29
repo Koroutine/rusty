@@ -35,6 +35,20 @@ func TestResult(t *testing.T) {
 		So(value, ShouldEqual, 1)
 	})
 
+	Convey("MapOption convers Option to another value", t, func() {
+		res := ToResult(strconv.Atoi("10"))
+		value := MapResult(res, func(v int) string { return fmt.Sprint(v) }).Unwrap()
+
+		So(value, ShouldEqual, "10")
+	})
+
+	Convey("MapOption with UnwrapOr returns fallback value if None", t, func() {
+		res := ToResult(strconv.Atoi("-"))
+		value := MapResult(res, func(v int) string { return fmt.Sprint(v) }).UnwrapOr("1")
+
+		So(value, ShouldEqual, "1")
+	})
+
 	Convey("IsOk returns true if Ok", t, func() {
 		value := ToResult(strconv.Atoi("10")).IsOk()
 

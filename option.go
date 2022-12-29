@@ -69,3 +69,13 @@ func (o *Option[T]) IsSomeWith(fn func(value T) bool) bool {
 func (o *Option[T]) IsNone() bool {
 	return !o.IsSome()
 }
+
+func MapOption[T any, N any](option *Option[T], fn func(value T) N) *Option[N] {
+
+	if option.IsSome() {
+		data := fn(option.Unwrap())
+		return ToOption(&data)
+	}
+
+	return ToOption[N](nil)
+}

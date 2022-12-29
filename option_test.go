@@ -1,6 +1,7 @@
 package rusty
 
 import (
+	"fmt"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -36,6 +37,20 @@ func TestOption(t *testing.T) {
 		value := ToOption(none).UnwrapOrElse(func() int { return 1 })
 
 		So(value, ShouldEqual, 1)
+	})
+
+	Convey("MapOption convers Option to another value", t, func() {
+		option := ToOption(&some)
+		value := MapOption(option, func(v int) string { return fmt.Sprint(v) }).Unwrap()
+
+		So(value, ShouldEqual, "10")
+	})
+
+	Convey("MapOption with UnwrapOr returns fallback value if None", t, func() {
+		option := ToOption[int](nil)
+		value := MapOption(option, func(v int) string { return fmt.Sprint(v) }).UnwrapOr("1")
+
+		So(value, ShouldEqual, "1")
 	})
 
 	Convey("IsSome returns true if Some", t, func() {
