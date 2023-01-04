@@ -13,3 +13,11 @@ func ToString(value any) *rusty.Result[string] {
 	return rusty.ToResult(string(res), err)
 
 }
+
+func FromString[T any](value string) *rusty.Result[T] {
+
+	var data T
+	err := json.Unmarshal([]byte(value), &data)
+
+	return rusty.ToResult(data, err)
+}
