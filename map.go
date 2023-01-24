@@ -12,25 +12,57 @@ func Get[T any](d Map, keypath string) *Result[T] {
 
 	var segs []string = strings.Split(keypath, ".")
 
-	obj := d
+	var obj interface{}
+
+	obj = d
 
 	for fieldIndex, field := range segs {
 
 		if fieldIndex == len(segs)-1 {
-			v, ok := obj[field].(T)
+
+			var value interface{}
+
+			switch o := obj.(type) {
+			case []interface{}:
+				value = o[ToString(field).ParseInt().Unwrap()]
+			case []string:
+				value = o[ToString(field).ParseInt().Unwrap()]
+			case []int:
+				value = o[ToString(field).ParseInt().Unwrap()]
+			case Map:
+				value = o[field]
+			}
+
+			v, ok := value.(T)
 
 			if ok {
 				return ToResult(v, nil)
 			} else {
-				return ToResult(v, fmt.Errorf("type assertion failed: %v", obj[field]))
+				return ToResult(v, fmt.Errorf("type assertion failed: %v", value))
 			}
 		}
 
-		switch obj[field].(type) {
+		switch o := obj.(type) {
+		case []interface{}:
+			value := o[ToString(field).ParseInt().Unwrap()]
+			switch v := value.(type) {
+			case Map:
+				obj = v
+			case map[string]interface{}:
+				obj = Map(v)
+			case []any, []string, []int:
+				obj = v
+			}
 		case Map:
-			obj = obj[field].(Map)
-		case map[string]interface{}:
-			obj = Map(obj[field].(map[string]interface{}))
+			value := o[field]
+			switch v := value.(type) {
+			case Map:
+				obj = v
+			case map[string]any:
+				obj = Map(v)
+			case []any, []string, []int:
+				obj = v
+			}
 		}
 
 	}

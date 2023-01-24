@@ -19,6 +19,18 @@ func TestGet(t *testing.T) {
 		},
 	}
 
+	arrayTest := Map{
+		"a": []string{
+			"1",
+		},
+	}
+
+	Convey("Find value at array path", t, func() {
+		value := Get[string](arrayTest, "a.0").Unwrap()
+
+		So(value, ShouldEqual, "1")
+	})
+
 	Convey("Find value at path", t, func() {
 		value := Get[string](target, "a.b.c").Unwrap()
 
