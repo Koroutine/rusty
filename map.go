@@ -84,3 +84,15 @@ func GetInt(d Map, keypath string) *Result[int] {
 
 	return ToResult(int(v), err)
 }
+
+func GetInt64(d Map, keypath string) *Result[int64] {
+	res := Get[string](d, keypath)
+
+	if res.IsErr() {
+		return ToResult(int64(0), res.err)
+	}
+
+	v, err := strconv.ParseInt(res.data, 10, 64)
+
+	return ToResult(v, err)
+}
