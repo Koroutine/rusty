@@ -91,6 +91,12 @@ func TestResult(t *testing.T) {
 		So(value, ShouldEqual, 10)
 	})
 
+	Convey("Err returns result as Option", t, func() {
+		value := ToError(fmt.Errorf("Error")).Err().Unwrap()
+
+		So(value, ShouldResemble, fmt.Errorf("Error"))
+	})
+
 	Convey("Ok returns result as Option - handles bad result", t, func() {
 		So(func() { ToResult(strconv.Atoi("test")).Ok().Expect("woops") }, ShouldPanic)
 	})

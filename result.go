@@ -109,7 +109,7 @@ func (o *Result[T]) Ok() *Option[T] {
 }
 
 func (o *Result[T]) Err() *Option[error] {
-	if o.err != nil {
+	if o.err == nil {
 		return ToNone[error]()
 	}
 
