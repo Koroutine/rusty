@@ -108,6 +108,14 @@ func (o *Result[T]) Ok() *Option[T] {
 	return ToOption(&o.data)
 }
 
+func (o *Result[T]) Err() *Option[error] {
+	if o.err != nil {
+		return ToNone[error]()
+	}
+
+	return ToOption(&o.err)
+}
+
 func (o *Result[T]) IsOkWith(fn func(value T) bool) bool {
 	if o.err != nil {
 		return false
