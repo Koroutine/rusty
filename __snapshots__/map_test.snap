@@ -43,10 +43,20 @@
 {
  "Records": [
   {
+   "Outcome_details": [
+    {
+     "id": "test",
+     "obj": {
+      "a": "test3",
+      "b": "test4"
+     }
+    }
+   ],
    "Record_details": {
     "id": "test",
     "obj": {
-     "value": "test"
+     "a": "test1",
+     "b": "test2"
     }
    }
   }

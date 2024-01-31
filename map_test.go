@@ -79,7 +79,12 @@ func TestSet(t *testing.T) {
 				{
 					"Record_details": {
 						"id": "test"
-					}
+					},
+					"Outcome_details": [
+						{
+							"id": "test"
+						}
+					]
 				}
 			]
 		}`
@@ -88,11 +93,15 @@ func TestSet(t *testing.T) {
 		err := json.Unmarshal([]byte(input), &inputMap)
 		So(err, ShouldBeNil)
 
-		Set(inputMap, "Records.0.Record_details.obj.value", "test").Unwrap()
+		Set(inputMap, "Records.0.Record_details.obj.a", "test1").Unwrap()
+		Set(inputMap, "Records.0.Record_details.obj.b", "test2").Unwrap()
 
-		updated := Get[string](inputMap, "Records.0.Record_details.obj.value").Unwrap()
+		Set(inputMap, "Records.0.Outcome_details.0.obj.a", "test3").Unwrap()
+		Set(inputMap, "Records.0.Outcome_details.0.obj.b", "test4").Unwrap()
 
-		So(updated, ShouldEqual, "test")
+		updated := Get[string](inputMap, "Records.0.Record_details.obj.a").Unwrap()
+
+		So(updated, ShouldEqual, "test1")
 
 		snaps.MatchJSON(t, inputMap)
 	})
