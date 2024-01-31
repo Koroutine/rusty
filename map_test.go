@@ -1,13 +1,104 @@
 package rusty
 
 import (
+	"encoding/json"
 	"testing"
 
+	"github.com/gkampitakis/go-snaps/snaps"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-func TestGet(t *testing.T) {
+func TestSet(t *testing.T) {
+	Convey("Set value at existing path", t, func() {
+		target := map[string]interface{}{
+			"a": 1,
+			"b": map[string]interface{}{
+				"c": "2",
+				"d": map[string]interface{}{
+					"e": 3,
+					"f": true,
+					"g": "hello",
+				},
+			},
+		}
 
+		Set(target, "b.d.g", "test").Unwrap()
+
+		updated := Get[string](target, "b.d.g").Unwrap()
+
+		So(updated, ShouldEqual, "test")
+
+		snaps.MatchJSON(t, target)
+	})
+
+	Convey("Set value at new path", t, func() {
+		target := map[string]interface{}{
+			"a": 1,
+			"b": map[string]interface{}{
+				"c": "2",
+				"d": map[string]interface{}{
+					"e": 3,
+					"f": true,
+					"g": "hello",
+				},
+			},
+		}
+
+		Set(target, "b.d.g.r", "test").Unwrap()
+
+		updated := Get[string](target, "b.d.g.r").Unwrap()
+
+		So(updated, ShouldEqual, "test")
+
+		snaps.MatchJSON(t, target)
+	})
+
+	Convey("Set value on object inside array", t, func() {
+		target := map[string]interface{}{
+			"a": 1,
+			"arr": []interface{}{
+				map[string]interface{}{
+					"key": "value",
+				},
+			},
+		}
+
+		Set(target, "arr.0.key", "test").Unwrap()
+
+		updated := Get[string](target, "arr.0.key").Unwrap()
+
+		So(updated, ShouldEqual, "test")
+
+		snaps.MatchJSON(t, target)
+	})
+
+	Convey("Set realworld", t, func() {
+		// String JSON multiline
+		input := `{
+			"Records": [
+				{
+					"Record_details": {
+						"id": "test"
+					}
+				}
+			]
+		}`
+
+		var inputMap Map
+		err := json.Unmarshal([]byte(input), &inputMap)
+		So(err, ShouldBeNil)
+
+		Set(inputMap, "Records.0.Record_details.obj.value", "test").Unwrap()
+
+		updated := Get[string](inputMap, "Records.0.Record_details.obj.value").Unwrap()
+
+		So(updated, ShouldEqual, "test")
+
+		snaps.MatchJSON(t, inputMap)
+	})
+}
+
+func TestGet(t *testing.T) {
 	target := map[string]interface{}{
 		"a": 1,
 		"b": map[string]interface{}{
@@ -56,5 +147,4 @@ func TestGet(t *testing.T) {
 	Convey("Unwrap panics if type assertion fails", t, func() {
 		So(func() { Get[int](target, "a.b.c").Unwrap() }, ShouldPanic)
 	})
-
 }

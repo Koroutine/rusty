@@ -8,8 +8,80 @@ import (
 
 type Map map[string]interface{}
 
-func Get[T any](d Map, keypath string) *Result[T] {
+func Set(d Map, keypath string, value any) *Result[Map] {
+	// Update Map with new value set at keypath (through cloning)
 
+	var segs []string = strings.Split(keypath, ".")
+
+	var obj interface{}
+
+	obj = d
+
+	for fieldIndex, field := range segs {
+
+		if fieldIndex == len(segs)-1 {
+
+			switch o := obj.(type) {
+			case []interface{}:
+				o[ToString(field).ParseInt().Unwrap()] = value
+			case []string:
+
+				v, ok := value.(string)
+				if !ok {
+					return ToResult(d, fmt.Errorf("type assertion failed: %v", value))
+				}
+
+				o[ToString(field).ParseInt().Unwrap()] = v
+			case []int:
+
+				v, ok := value.(int)
+				if !ok {
+					return ToResult(d, fmt.Errorf("type assertion failed: %v", value))
+				}
+
+				o[ToString(field).ParseInt().Unwrap()] = v
+			case Map:
+				o[field] = value
+			}
+
+			return ToResult(d, nil)
+		}
+
+		switch o := obj.(type) {
+		case []interface{}:
+			value := o[ToString(field).ParseInt().Unwrap()]
+			switch v := value.(type) {
+			case Map:
+				obj = v
+			case map[string]interface{}:
+				obj = Map(v)
+			case []any, []string, []int:
+				obj = v
+			}
+		case Map:
+			value := o[field]
+
+			if value == nil {
+				value = make(map[string]interface{})
+				o[field] = value
+			}
+
+			switch v := value.(type) {
+			case Map:
+				obj = v
+			case map[string]interface{}:
+				obj = Map(v)
+			case []any, []string, []int:
+				obj = v
+			}
+		}
+
+	}
+
+	return ToResult(d, fmt.Errorf("path not found: %s", keypath))
+}
+
+func Get[T any](d Map, keypath string) *Result[T] {
 	var segs []string = strings.Split(keypath, ".")
 
 	var obj interface{}
@@ -70,7 +142,6 @@ func Get[T any](d Map, keypath string) *Result[T] {
 	var v T
 
 	return ToResult(v, fmt.Errorf("path not found: %s", keypath))
-
 }
 
 func GetInt(d Map, keypath string) *Result[int] {
