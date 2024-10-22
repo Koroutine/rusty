@@ -105,6 +105,28 @@ func TestSet(t *testing.T) {
 
 		snaps.MatchJSON(t, inputMap)
 	})
+
+	Convey("when using a key that has escaped dots", t, func() {
+		target := map[string]interface{}{
+			"a": 1,
+			"b": map[string]interface{}{
+				"c": "2",
+				"d": map[string]interface{}{
+					"e": 3,
+					"f": true,
+					"g": "hello",
+				},
+			},
+		}
+
+		Set(target, "b.d.g\\.r", "test").Unwrap()
+
+		updated := Get[string](target, "b.d.g\\.r").Unwrap()
+
+		So(updated, ShouldEqual, "test")
+
+		snaps.MatchJSON(t, target)
+	})
 }
 
 func TestGet(t *testing.T) {
