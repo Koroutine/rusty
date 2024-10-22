@@ -8,13 +8,28 @@ import (
 
 type Map map[string]interface{}
 
+const (
+	escapedDot = "\\."
+	safeDot    = "\x00"
+)
+
+func splitPath(keyPath string) []string {
+	// Ignore any escaped dots in the keypath
+	safePath := strings.ReplaceAll(keyPath, escapedDot, safeDot)
+
+	var segs []string = strings.Split(safePath, ".")
+
+	for i, s := range segs {
+		segs[i] = strings.ReplaceAll(s, safeDot, ".")
+	}
+
+	return segs
+}
+
 func Set(d Map, keypath string, value any) *Result[Map] {
 	// Update Map with new value set at keypath (through cloning)
 
-	// Ignore any escaped dots in the keypath
-	keypath = strings.ReplaceAll(keypath, "\\.", "_")
-
-	var segs []string = strings.Split(keypath, ".")
+	segs := splitPath(keypath)
 
 	var obj interface{}
 
@@ -85,10 +100,7 @@ func Set(d Map, keypath string, value any) *Result[Map] {
 }
 
 func Get[T any](d Map, keypath string) *Result[T] {
-	// Ignore any escaped dots in the keypath
-	keypath = strings.ReplaceAll(keypath, "\\.", "_")
-
-	var segs []string = strings.Split(keypath, ".")
+	segs := splitPath(keypath)
 
 	var obj interface{}
 
